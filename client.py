@@ -21,7 +21,7 @@ class Client:
         context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
         context.verify_mode = ssl.CERT_REQUIRED
         context.check_hostname = True
-        context.load_verify_locations("ssl.crt")
+        context.load_verify_locations("example.crt")
 
         if sock is None:
             aux = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

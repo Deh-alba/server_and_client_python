@@ -173,9 +173,9 @@ class ServerThread(Thread):
         # Usar https e ssl- segurança
 
 context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-context.load_cert_chain(certfile="ssl.crt", keyfile="ssl.key")
+context.load_cert_chain(certfile="example.crt", keyfile="example.key")
 
-tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+tcpsock = socket.socket()
 tcpsock.bind((TCP_IP, TCP_PORT))
 threads = []
 tcpsock.listen(4)
