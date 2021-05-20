@@ -24,14 +24,13 @@ class ServerThread(Thread):
         self.port = port
         # connstream = context.wrap_socket(newsocket, server_side=True)
         if sock is None:
-            # ta certo isso?
             aux = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock = context.wrap_socket(aux, server_side=True)
         else:
             # self.sock = sock
             self.sock = context.wrap_socket(sock, server_side=True)
 
-    # função que recebe o arquivo de execução
+    # receive file
     def receiveFile(self):
 
         data = self.sock.recv(BUFFER_SIZE)
@@ -46,7 +45,7 @@ class ServerThread(Thread):
 
         print('Successfully get the file')
 
-    # função que recebe os arquivos de dependencias
+    # receive dependencies
     def receiveFileDependencies(self):
 
         data = self.sock.recv(BUFFER_SIZE)
@@ -63,7 +62,7 @@ class ServerThread(Thread):
         # return 200
         print('Successfully get the file')
 
-    # função que busca as dependencias e executa o arquivo de execução
+    # run node install, node file and get output 
     def runnigFile(self):
 
         os.system("npm install")
@@ -71,7 +70,7 @@ class ServerThread(Thread):
 
         return a[0]
 
-    # função que recebe mensagens do cliente
+    # receibe client message
     def myreceive(self, EOFChar='\036'):
         msg = ''
         MSGLEN = 100
@@ -89,7 +88,7 @@ class ServerThread(Thread):
                 msg = None
             return msg
 
-    # função que envia mensagem para o cliente
+    # send message for client
     def mysend(self, msg):
         totalsent = 0
         MSGLEN = len(msg)
@@ -101,7 +100,7 @@ class ServerThread(Thread):
 
             totalsent = totalsent + sent
 
-    # função de autenticação do cliente
+    # authneticate
     def autentica(self):
         print("------------- User authentication -------------\n")
 
@@ -133,38 +132,38 @@ class ServerThread(Thread):
                     print("---------------------------------------------")
                     return "password error" # Todo - return error number
 
-    # função para fechar a conexão com um cliente
+    # close connection with client
     def quit(self):
         print("return close running")
         self.sock.close()
 
     def run(self):
 
-        # recebe o preiro comando
-        comando = self.myreceive()
+        # receve commands
+        comand = self.myreceive()
 
-        if comando[:5] == "user":
-            # chama metodo para receber o json de autenticação teste se o arquivo e json
+        if comand[:5] == "user":
+            
             retorno = self.autentica()
 
             if retorno == "ok":
 
-                # envia o retorno para o cliente
+                # send return for client
                 self.mysend("ok")
 
-                # recebe o arquvio de dependencias
+                # receive dependencies 
                 self.receiveFileDependencies()
 
-                # recebe o arquivo de execução
+                # receive execution file
                 self.receiveFile()
 
-                # executa a busca por dependencias e executa o arquivo js
+                # install dependencies and execut file js
                 retur = self.runnigFile()
 
-                # retorna para o cliente o resultado da execução
+                # return result of execution for client
                 self.mysend(retur)
 
-                # encerra a conexão
+                # close connection
                 self.quit()
 
         else:
@@ -183,7 +182,7 @@ tcpsock.listen(4)
 
 while True:
 
-    print ("Esperando conexões...")
+    print ("Waiting connections...")
 
     connection, addres = tcpsock.accept()
     newthread = ServerThread(TCP_IP, addres, context, connection)

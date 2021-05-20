@@ -35,14 +35,14 @@ class Client:
         self.s.send(command.encode())
 
     def recevCommandServer(self):
-        retorno = self.s.recv(BUFFER_SIZE).decode()
+        return_server = self.s.recv(BUFFER_SIZE).decode()
         self.s.close()
-        return retorno
+        return return_server
 
     def clientThreadConnect(self):
         self.s.connect((TCP_IP, TCP_PORT))
 
-    def clienteReconnect(self):
+    def clientReconnect(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def clientThreadCloseConection(self):
@@ -80,36 +80,36 @@ class Client:
 
 print ("====================================")
 print ("")
-print ("Iniciando cliente.... ")
+print ("Iniciando client.... ")
 print ("")
 # print (socket.gethostbyaddr('10.13.239.210'))
 
-cliente = Client()
+client = Client()
 # conect client
-cliente.clientThreadConnect()
+client.clientThreadConnect()
 # send commando for autenticate
-cliente.send("user")
+client.send("user")
 # receive return
-retorno = cliente.receive()
+return_server = client.receive()
 
-if retorno == "ok":
+if return_server == "ok":
 
     filename = "test.js"
     fileDependencies = "pack.json"
     # send file for dependencies
-    cliente.sendArquive(fileDependencies)
+    client.sendArquive(fileDependencies)
     # send file for execution
-    cliente.sendArquive(filename)
+    client.sendArquive(filename)
     # receive return 
-    retorno = cliente.receive()
-    print(retorno)
+    return_server = client.receive()
+    print(return_server)
 
     # close connection
-    cliente.clientThreadCloseConection()
+    client.clientThreadCloseConection()
 
 else:
-    print(retorno)
-    cliente.clientThreadCloseConection()
+    print(return_server)
+    client.clientThreadCloseConection()
 
 # quit
 quit = 1    
@@ -129,30 +129,29 @@ while quit != 1:
     print ("====================================")
     print ("")
 
-    entrada = input("Digit your option: ")
+    entrance = input("Digit your option: ")
     print ("")
 
-    # Analisa os 5 primeiros caracteres e confere se o que foi digitado
-    # pelo usuário corresponde aos comandos aceitos.
-    if entrada[:5] == "user ":
+    # get and validate user command
+    if entrance[:5] == "user ":
 
-        # Contecta no servidor
-        cliente.clientThreadConnect()
+        # open connect with server
+        client.clientThreadConnect()
 
-        # Verifica se o arquivo de entrada possui a extensão json
-        if entrada[len(entrada)-5:] == ".json":
+        # test if the file is json
+        if entrance[len(entrance)-5:] == ".json":
             print ("Login in server...")
             print ("")
-            user_login = entrada[5:]
+            user_login = entrance[5:]
             print ("====================================")
             print ("")
             print ("File sent: ", user_login)
             print ("")
-            # cliente.clientThreadConnect()
+            
 
 
-            # TODO autenticar usuário de acordo com o arquivo userlist.json
-            # Autenticacao direta - deve ser enviado arquivo chamado user.json
+            # autenthicate user with user.json 
+            # revise
             with open(user_login) as f:
                 json_dict = json.load(f)
                 users = json_dict["userlist"]
@@ -167,63 +166,64 @@ while quit != 1:
                         print ("grupo04 autenticado")
                     else:
                         print ("")
-                        print ("Usuário/senha inválido(s), verifique \nseu arquivo .json e envie-o novamente.")
+                        print ("User or passwor invelid")
             print ("")
         else:
-            print("[ERRO 303] - Arquivo em formato inválido.")
+            print("[ERROR 303] - format invalid.")
     # SEND
-    elif entrada[:5] == "send ":
-        # manda string para o servidor
-        entrada = "send test.js"
+    elif entrance[:5] == "send ":
+        # send name file for server
+        entrance = "send test.js"
 
         #print("valida 1")
-        cliente.sendCommandServer(entrada[:5])
+        client.sendCommandServer(entrance[:5])
         #print("valida 2")
-        validate = cliente.recevCommandServer()
+        validate = client.recevCommandServer()
         validate = "ok"
-        # Verifica se é um arquivo no formato JS
+        # validate file
         #print("valida 3")
 
         if validate == "ok":
             #print("valida 3")
-            if entrada[len(entrada)-3:] == ".js":
-                # Pega o nome do arquivo enviado para validação
-                filename = entrada[5:]
+            if entrance[len(entrance)-3:] == ".js":
+                # get namo for validation
+                filename = entrance[5:]
                 print (filename)
-                # Pega as informações referentes ao arquivo
+                # get information file
                 filestat = os.stat(filename)
-                # print (filestat)
+                
                 filesize = filestat.st_size
                 print ("This file has", filesize, "bytes.")
-                if filesize > 3000000:     # TODO maior que 2Mb descarta
+                # test file size
+                if filesize > 3000000:     
                     print ("The file is too large.")
                 else:
                     print ("Size correct.")
-                    cliente.clientThreadSendFile(filename)
+                    client.clientThreadSendFile(filename)
 
-                    # cliente.clientThreadCloseConection()
+                    # client.clientThreadCloseConection()
 
     # RUN
-    elif entrada == "run":
+    elif entrance == "run":
 
         print ("====================================")
         print ("")
         print ("Trying to run application...")
         print ("")
-        cliente.sendCommandServer("run")
+        client.sendCommandServer("run")
         # print("parou 1")
-        cliente.recevCommandServer()
+        client.recevCommandServer()
         # print("parou 2")
         # insert return here
     # QUIT
-    elif entrada == "quit":
+    elif entrance == "quit":
         print ("====================================")
         print ("")
         print ("Closing client!")
         print ("")
         print ("====================================")
-        cliente.sendCommandServer("quit")
-        cliente.clientThreadCloseConection()
+        client.sendCommandServer("quit")
+        client.clientThreadCloseConection()
         quit = 1
     else:
         print ("====================================")
