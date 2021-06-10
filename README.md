@@ -1,5 +1,7 @@
 # Attention readme in construction yey
 
+## Attention this project is now deprecated. Next i will disponibilize, new version. 
+
 ## Work
 
 This work aims to explore a little the concepts of sockets in python.
