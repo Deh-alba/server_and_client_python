@@ -1,6 +1,6 @@
 # Attention readme in construction yey
 
-## Attention this project is now deprecated. Next i will disponibilize, new version. 
+## Attention this project is now deprecated. Next i will disponibiliza, new version. 
 
 ## Work
 
